@@ -60,7 +60,7 @@ pub struct Persian;
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 
 /// The inner date type used for representing [`Date`]s of [`Persian`]. See [`Date`] and [`Persian`] for more details.
-pub struct PersianDateInner(ArithmeticDate<Persian>);
+pub struct PersianDateInner(pub(crate) ArithmeticDate<Persian>);
 
 impl CalendarArithmetic for Persian {
     type YearInfo = ();

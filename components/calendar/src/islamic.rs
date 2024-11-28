@@ -285,7 +285,7 @@ impl IslamicYearInfo {
         (year_info, extended_year)
     }
 
-    fn compute<IB: IslamicBasedMarker>(extended_year: i32) -> Self {
+    pub(crate) fn compute<IB: IslamicBasedMarker>(extended_year: i32) -> Self {
         let ny = IB::fixed_from_islamic(extended_year, 1, 1);
         let packed_data = PackedIslamicYearInfo::compute_with_ny::<IB>(extended_year, ny);
         let prev_ny = IB::fixed_from_islamic(extended_year - 1, 1, 1);
@@ -408,7 +408,7 @@ impl<'b, IB: IslamicBasedMarker> IslamicPrecomputedData<'b, IB> {
 /// The inner date type used for representing [`Date`]s of [`IslamicObservational`]. See [`Date`] and [`IslamicObservational`] for more details.
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct IslamicDateInner(ArithmeticDate<IslamicObservational>);
+pub struct IslamicDateInner(pub(crate) ArithmeticDate<IslamicObservational>);
 
 impl CalendarArithmetic for IslamicObservational {
     type YearInfo = IslamicYearInfo;
@@ -553,7 +553,7 @@ impl Calendar for IslamicObservational {
 }
 
 impl IslamicObservational {
-    fn precomputed_data(&self) -> IslamicPrecomputedData<ObservationalIslamicMarker> {
+    pub(crate) fn precomputed_data(&self) -> IslamicPrecomputedData<ObservationalIslamicMarker> {
         IslamicPrecomputedData::new(self.data.as_ref().map(|x| x.get()))
     }
 
@@ -635,7 +635,7 @@ impl<A: AsCalendar<Calendar = IslamicObservational>> DateTime<A> {
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 /// The inner date type used for representing [`Date`]s of [`IslamicUmmAlQura`]. See [`Date`] and [`IslamicUmmAlQura`] for more details.
-pub struct IslamicUmmAlQuraDateInner(ArithmeticDate<IslamicUmmAlQura>);
+pub struct IslamicUmmAlQuraDateInner(pub(in crate) ArithmeticDate<IslamicUmmAlQura>);
 
 impl CalendarArithmetic for IslamicUmmAlQura {
     type YearInfo = IslamicYearInfo;
@@ -779,7 +779,7 @@ impl Calendar for IslamicUmmAlQura {
 }
 
 impl IslamicUmmAlQura {
-    fn precomputed_data(&self) -> IslamicPrecomputedData<SaudiIslamicMarker> {
+    pub(crate) fn precomputed_data(&self) -> IslamicPrecomputedData<SaudiIslamicMarker> {
         IslamicPrecomputedData::new(self.data.as_ref().map(|x| x.get()))
     }
 
@@ -864,7 +864,7 @@ impl<A: AsCalendar<Calendar = IslamicUmmAlQura>> DateTime<A> {
 /// The inner date type used for representing [`Date`]s of [`IslamicCivil`]. See [`Date`] and [`IslamicCivil`] for more details.
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct IslamicCivilDateInner(ArithmeticDate<IslamicCivil>);
+pub struct IslamicCivilDateInner(pub(in crate) ArithmeticDate<IslamicCivil>);
 
 impl CalendarArithmetic for IslamicCivil {
     type YearInfo = ();
@@ -1096,7 +1096,7 @@ impl<A: AsCalendar<Calendar = IslamicCivil>> DateTime<A> {
 /// The inner date type used for representing [`Date`]s of [`IslamicTabular`]. See [`Date`] and [`IslamicTabular`] for more details.
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct IslamicTabularDateInner(ArithmeticDate<IslamicTabular>);
+pub struct IslamicTabularDateInner(pub(in crate) ArithmeticDate<IslamicTabular>);
 
 impl CalendarArithmetic for IslamicTabular {
     type YearInfo = ();

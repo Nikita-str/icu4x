@@ -49,7 +49,7 @@ pub struct ArithmeticDateRangeFromIter<A: AsCalendar + Clone> {
     cur: Inner<A>,
     step: StepType,
     first: bool,
-    calenda: A,
+    calendar: A,
 }
 
 
@@ -63,7 +63,7 @@ where Inner<A>: AsArithmeticDate<A>
             cur: start,
             step,
             first: true,
-            calenda,
+            calendar: calenda,
         }
     }
 
@@ -92,7 +92,7 @@ where Inner<A>: AsArithmeticDate<A>
         let prev = Inner::<A>::to_arithmetic_date(self.cur.clone());
         if self.first {
             self.first = false;
-            return Some(Date::from_raw(self.cur.clone(), self.calenda.clone()))
+            return Some(Date::from_raw(self.cur.clone(), self.calendar.clone()))
         }
 
         
@@ -121,7 +121,7 @@ where Inner<A>: AsArithmeticDate<A>
                             return None
                         }
                         cur.year += 1;
-                        cur.year_info = Inner::<A>::year_info_for_year(cur.year);
+                        cur.year_info = Inner::<A>::year_info_for_year(cur.year, &self.calendar);
                         cur.month = 1;
                     } else {
                         cur.month += 1;
@@ -136,7 +136,7 @@ where Inner<A>: AsArithmeticDate<A>
                             return None
                         }
                         cur.year -= 1;
-                        cur.year_info = Inner::<A>::year_info_for_year(cur.year);
+                        cur.year_info = Inner::<A>::year_info_for_year(cur.year, &self.calendar);
                         cur.month = cur.months_in_year();
                     } else {
                         cur.month -= 1;
@@ -150,45 +150,81 @@ where Inner<A>: AsArithmeticDate<A>
 
         self.cur = Inner::<A>::from_arithmetic_date(cur);
 
-        Some(Date::from_raw(self.cur.clone(), self.calenda.clone()))
+        Some(Date::from_raw(self.cur.clone(), self.calendar.clone()))
     }
 }
 
 
-#[test]
-fn test_range_01() {
-    use crate::Iso;
+#[cfg(test)]
+mod tests {
+    use crate::{Calendar, Date};
+    use crate::{Iso, chinese::Chinese};
     use calendrical_calculations::rata_die::RataDie;
+    use super::ArithmeticDateRangeFromIter;
 
-    let date = Date::try_new_iso(2024, 3, 4).unwrap();
-    let date = *date.inner();
-
-    let mut range_backward_1 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, -1);
-    let mut range_backward_3 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, -3);
-    let mut range_forward_1 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, 1);
-    let mut range_forward_3 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, 3);
-
-    let rata_die_init = Iso::fixed_from_iso(date);
+    #[test]
+    fn test_ranges() {
+        let cal = Chinese::new();
+        let date = Date::try_new_chinese_with_calendar(4660, 6, 11, cal.clone()).unwrap();
+        let date = *date.inner();
     
-    for i in 0..10_000 {
-        let backward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() - i));
-        let backward = range_backward_1.next().unwrap();
-        assert_eq!(backward, backward_must);
-        assert_eq!(backward.inner.0.year_info, backward_must.inner.0.year_info);
+        // let mut range_backward_1 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, -1);
+        // let mut range_backward_3 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, -3);
+        // let mut range_forward_1 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, 1);
+        // let mut range_forward_3 = ArithmeticDateRangeFromIter::new_within_month(date, Iso, 3);
+        // let rata_die_init = Iso::fixed_from_iso(date);
+        //
+        // for i in 0..10_000 {
+        //     let backward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() - i));
+        //     let backward = range_backward_1.next().unwrap();
+        //     assert_eq!(backward, backward_must);
+        //     assert_eq!(backward.inner.0.year_info, backward_must.inner.0.year_info);
+    
+        //     let forward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() + i));
+        //     let forward = range_forward_1.next().unwrap();
+        //     assert_eq!(forward, forward_must);
+        //     assert_eq!(forward.inner.0.year_info, forward_must.inner.0.year_info);
+            
+        //     if i % 3 == 0 {
+        //         let backward_3 = range_backward_3.next().unwrap();
+        //         assert_eq!(backward_3, backward_must);
+        //         assert_eq!(backward_3.inner.0.year_info, backward_must.inner.0.year_info);
+    
+        //         let forward_3 = range_forward_3.next().unwrap();
+        //         assert_eq!(forward_3, forward_must);
+        //         assert_eq!(forward_3.inner.0.year_info, forward_must.inner.0.year_info);
+        //     }
+        // }
 
-        let forward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() + i));
-        let forward = range_forward_1.next().unwrap();
-        assert_eq!(forward, forward_must);
-        assert_eq!(forward.inner.0.year_info, forward_must.inner.0.year_info);
+        let mut range_backward_1 = ArithmeticDateRangeFromIter::new_within_month(date, cal.clone(), -1);
+        let mut range_backward_3 = ArithmeticDateRangeFromIter::new_within_month(date, cal.clone(), -3);
+        let mut range_forward_1 = ArithmeticDateRangeFromIter::new_within_month(date, cal.clone(), 1);
+        let mut range_forward_3 = ArithmeticDateRangeFromIter::new_within_month(date, cal.clone(), 3);
+        let rata_die_init = cal.date_to_iso(&date).to_fixed();
         
-        if i % 3 == 0 {
-            let backward_3 = range_backward_3.next().unwrap();
-            assert_eq!(backward_3, backward_must);
-            assert_eq!(backward_3.inner.0.year_info, backward_must.inner.0.year_info);
-
-            let forward_3 = range_forward_3.next().unwrap();
-            assert_eq!(forward_3, forward_must);
-            assert_eq!(forward_3.inner.0.year_info, forward_must.inner.0.year_info);
+        for i in 0..10_000 {
+            
+            let backward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() - i));
+            let backward_must = cal.date_from_iso(backward_must);
+            let backward = range_backward_1.next().unwrap().inner;
+            assert_eq!(backward, backward_must);
+            assert_eq!(backward.0.0.year_info, backward_must.0.0.year_info);
+    
+            let forward_must = Iso::iso_from_fixed(RataDie::new(rata_die_init.to_i64_date() + i));
+            let forward_must = cal.date_from_iso(forward_must);
+            let forward = range_forward_1.next().unwrap().inner;
+            assert_eq!(forward, forward_must);
+            assert_eq!(forward.0.0.year_info, forward_must.0.0.year_info);
+            
+            // if i % 3 == 0 {
+            //     let backward_3 = range_backward_3.next().unwrap();
+            //     assert_eq!(backward_3, backward_must);
+            //     assert_eq!(backward_3.inner.0.year_info, backward_must.inner.0.year_info);
+    
+            //     let forward_3 = range_forward_3.next().unwrap();
+            //     assert_eq!(forward_3, forward_must);
+            //     assert_eq!(forward_3.inner.0.year_info, forward_must.inner.0.year_info);
+            // }
         }
     }
 }

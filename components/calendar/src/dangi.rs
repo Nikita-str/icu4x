@@ -102,7 +102,7 @@ pub struct Dangi {
 
 /// The inner date type used for representing [`Date`]s of [`Dangi`]. See [`Date`] and [`Dangi`] for more detail.
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
-pub struct DangiDateInner(ChineseBasedDateInner<Dangi>);
+pub struct DangiDateInner(pub(crate) ChineseBasedDateInner<Dangi>);
 
 type Inner = ChineseBasedDateInner<Dangi>;
 

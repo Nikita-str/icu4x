@@ -65,7 +65,7 @@ pub struct Hebrew;
 
 /// The inner date type used for representing [`Date`]s of [`Hebrew`]. See [`Date`] and [`Hebrew`] for more details.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct HebrewDateInner(ArithmeticDate<Hebrew>);
+pub struct HebrewDateInner(pub(in crate) ArithmeticDate<Hebrew>);
 
 impl Hebrew {
     /// Construct a new [`Hebrew`]
@@ -86,7 +86,7 @@ impl HebrewYearInfo {
     ///
     /// This can potentially be optimized with adjacent-year knowledge, but it's complex
     #[inline]
-    fn compute(h_year: i32) -> Self {
+    pub(in crate) fn compute(h_year: i32) -> Self {
         let keviyah = YearInfo::compute_for(h_year).keviyah;
         Self::compute_with_keviyah(keviyah, h_year)
     }

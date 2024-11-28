@@ -71,7 +71,7 @@ pub struct Roc;
 
 /// The inner date type used for representing [`Date`]s of [`Roc`]. See [`Date`] and [`Roc`] for more info.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct RocDateInner(IsoDateInner);
+pub struct RocDateInner(pub(crate) IsoDateInner);
 
 impl Calendar for Roc {
     type DateInner = RocDateInner;

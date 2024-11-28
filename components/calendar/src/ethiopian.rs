@@ -83,7 +83,7 @@ pub struct Ethiopian(pub(crate) bool);
 
 /// The inner date type used for representing [`Date`]s of [`Ethiopian`]. See [`Date`] and [`Ethiopian`] for more details.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct EthiopianDateInner(ArithmeticDate<Ethiopian>);
+pub struct EthiopianDateInner(pub(crate) ArithmeticDate<Ethiopian>);
 
 impl CalendarArithmetic for Ethiopian {
     type YearInfo = ();

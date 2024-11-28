@@ -62,7 +62,7 @@ pub(crate) struct ChineseBasedPrecomputedData<'a, CB: ChineseBased> {
 }
 
 /// Compute ChineseBasedYearInfo for a given extended year
-fn compute_cache<CB: ChineseBased>(extended_year: i32) -> ChineseBasedYearInfo {
+pub(crate) fn compute_cache<CB: ChineseBased>(extended_year: i32) -> ChineseBasedYearInfo {
     let mid_year = chinese_based::fixed_mid_year_from_year::<CB>(extended_year);
     let year_bounds = YearBounds::compute::<CB>(mid_year);
     compute_cache_with_yb::<CB>(extended_year, year_bounds)

@@ -58,7 +58,7 @@ pub struct Indian;
 
 /// The inner date type used for representing [`Date`]s of [`Indian`]. See [`Date`] and [`Indian`] for more details.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-pub struct IndianDateInner(ArithmeticDate<Indian>);
+pub struct IndianDateInner(pub(in crate) ArithmeticDate<Indian>);
 
 impl CalendarArithmetic for Indian {
     type YearInfo = ();
